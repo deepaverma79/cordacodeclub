@@ -2,7 +2,7 @@ package com.property.flow
 
 import co.paralleluniverse.fibers.Suspendable
 import com.property.contract.FundContract
-import com.property.contract.FundContract.Companion.IOU_CONTRACT_ID
+import com.property.contract.FundContract.Companion.FUND_CONTRACT_ID
 import com.property.flow.FundFlow.Acceptor
 import com.property.flow.FundFlow.Initiator
 import com.property.state.FundState
@@ -72,7 +72,7 @@ object FundFlow {
             val iouState = FundState(iouValue, serviceHub.myInfo.legalIdentities.first(), otherParty)
             val txCommand = Command(FundContract.Commands.Create(), iouState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(iouState, IOU_CONTRACT_ID)
+                    .addOutputState(iouState, FUND_CONTRACT_ID)
                     .addCommand(txCommand)
 
             // Stage 2.

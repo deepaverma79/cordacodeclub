@@ -1,7 +1,6 @@
 package com.property.contract
 
-import com.property.contract.FundContract
-import com.property.contract.FundContract.Companion.IOU_CONTRACT_ID
+import com.property.contract.FundContract.Companion.FUND_CONTRACT_ID
 import com.property.state.FundState
 import net.corda.core.identity.CordaX500Name
 import net.corda.testing.core.TestIdentity
@@ -16,10 +15,10 @@ class FundContractTests {
 
     @Test
     fun `transaction must include Create command`() {
-        val iou = 1
+        val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                output(IOU_CONTRACT_ID, FundState(iou, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
                 fails()
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Create())
                 verifies()
@@ -29,24 +28,24 @@ class FundContractTests {
 
     @Test
     fun `transaction must have no inputs`() {
-        val iou = 1
+        val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                input(IOU_CONTRACT_ID, FundState(iou, miniCorp.party, megaCorp.party))
-                output(IOU_CONTRACT_ID, FundState(iou, miniCorp.party, megaCorp.party))
+                input(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Create())
-                `fails with`("No inputs should be consumed when issuing an IOU.")
+                `fails with`("No inputs should be consumed when issuing an Fund.")
             }
         }
     }
 
     @Test
     fun `transaction must have one output`() {
-        val iou = 1
+        val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                output(IOU_CONTRACT_ID, FundState(iou, miniCorp.party, megaCorp.party))
-                output(IOU_CONTRACT_ID, FundState(iou, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Create())
                 `fails with`("Only one output state should be created.")
             }
@@ -55,10 +54,10 @@ class FundContractTests {
 
     @Test
     fun `lender must sign transaction`() {
-        val iou = 1
+        val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                output(IOU_CONTRACT_ID, FundState(iou, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
                 command(miniCorp.publicKey, FundContract.Commands.Create())
                 `fails with`("All of the participants must be signers.")
             }
@@ -67,10 +66,10 @@ class FundContractTests {
 
     @Test
     fun `borrower must sign transaction`() {
-        val iou = 1
+        val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                output(IOU_CONTRACT_ID, FundState(iou, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
                 command(megaCorp.publicKey, FundContract.Commands.Create())
                 `fails with`("All of the participants must be signers.")
             }
@@ -79,10 +78,10 @@ class FundContractTests {
 
     @Test
     fun `lender is not borrower`() {
-        val iou = 1
+        val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                output(IOU_CONTRACT_ID, FundState(iou, megaCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, megaCorp.party, megaCorp.party))
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Create())
                 `fails with`("The fundManager and the investor cannot be the same entity.")
             }
@@ -90,13 +89,25 @@ class FundContractTests {
     }
 
     @Test
-    fun `cannot create negative-value IOUs`() {
-        val iou = -1
+    fun `cannot create negative-value Fund`() {
+        val fundValue = -1
         ledgerServices.ledger {
             transaction {
-                output(IOU_CONTRACT_ID, FundState(iou, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Create())
-                `fails with`("The IOU's value must be non-negative.")
+                `fails with`("The Fund's value must be non-negative.")
+            }
+        }
+    }
+
+    @Test
+    fun `cannot create more than 10 million Fund`() {
+        val fundValue = 10000000
+        ledgerServices.ledger {
+            transaction {
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
+                command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Create())
+                `fails with`("The Fund's value must not be greater than a 10 million.")
             }
         }
     }
