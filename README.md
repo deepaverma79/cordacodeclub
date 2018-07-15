@@ -3,3 +3,4 @@
 # Property Investment CorDapp
 
 Welcome to the Property Investment CorDapp. 
+Phase 1
