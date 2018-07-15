@@ -10,11 +10,11 @@ import net.corda.core.transactions.LedgerTransaction
 /**
  * A implementation of a basic smart contract in Corda.
  *
- * This contract enforces rules regarding the creation of a valid [FundState], which in turn encapsulates an [IOU].
+ * This contract enforces rules regarding the creation of a valid [FundState], which in turn encapsulates an [Fund].
  *
- * For a new [IOU] to be issued onto the ledger, a transaction is required which takes:
+ * For a new [Fund] to be issued onto the ledger, a transaction is required which takes:
  * - Zero input states.
- * - One output state: the new [IOU].
+ * - One output state: the new [Fund].
  * - An Create() command with the public keys of both the fundManager and the investor.
  *
  * All contracts must sub-class the [Contract] interface.
@@ -22,7 +22,7 @@ import net.corda.core.transactions.LedgerTransaction
 open class FundContract : Contract {
     companion object {
         @JvmStatic
-        val IOU_CONTRACT_ID = "com.property.contract.FundContract"
+        val FUND_CONTRACT_ID = "com.property.contract.FundContract"
     }
 
     /**
@@ -32,15 +32,16 @@ open class FundContract : Contract {
     override fun verify(tx: LedgerTransaction) {
         val command = tx.commands.requireSingleCommand<Commands.Create>()
         requireThat {
-            // Generic constraints around the IOU transaction.
-            "No inputs should be consumed when issuing an IOU." using (tx.inputs.isEmpty())
+            // Generic constraints around the Fund transaction.
+            "No inputs should be consumed when issuing an Fund." using (tx.inputs.isEmpty())
             "Only one output state should be created." using (tx.outputs.size == 1)
             val out = tx.outputsOfType<FundState>().single()
             "The fundManager and the investor cannot be the same entity." using (out.fundManager != out.investor)
             "All of the participants must be signers." using (command.signers.containsAll(out.participants.map { it.owningKey }))
 
-            // IOU-specific constraints.
-            "The IOU's value must be non-negative." using (out.value > 0)
+            // Fund-specific constraints.
+            "The Fund's value must be non-negative." using (out.value > 0)
+            "The Fund's value must not be greater than a 10 million." using (out.value < 10000000)
         }
     }
 
