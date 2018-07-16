@@ -11,13 +11,13 @@ import net.corda.core.schemas.PersistentState
 import net.corda.core.schemas.QueryableState
 
 /**
- * The state object recording IOU agreements between two parties.
+ * The state object recording FundState agreements between two parties.
  *
  * A state must implement [ContractState] or one of its descendants.
  *
- * @param value the value of the IOU.
- * @param fundManager the party issuing the IOU.
- * @param investor the party receiving and approving the IOU.
+ * @param value the value of the FundState.
+ * @param fundManager the party issuing the FundState.
+ * @param investor the party receiving and approving the FundState.
  */
 data class FundState(val value: Int,
                      val fundManager: Party,

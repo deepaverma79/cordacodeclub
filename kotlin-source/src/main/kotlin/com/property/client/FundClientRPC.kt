@@ -27,13 +27,13 @@ private class FundClientRPC {
         val nodeAddress = NetworkHostAndPort.parse(args[0])
         val client = CordaRPCClient(nodeAddress)
 
-        // Can be amended in the com.example.MainKt file.
+        // Can be amended in the com.property.MainKt file.
         val proxy = client.start("user1", "test").proxy
 
-        // Grab all existing and future IOU states in the vault.
+        // Grab all existing and future Fund states in the vault.
         val (snapshot, updates) = proxy.vaultTrack(FundState::class.java)
 
-        // Log the 'placed' IOU states and listen for new ones.
+        // Log the 'placed' Fund states and listen for new ones.
         snapshot.states.forEach { logState(it) }
         updates.toBlocking().subscribe { update ->
             update.produced.forEach { logState(it) }

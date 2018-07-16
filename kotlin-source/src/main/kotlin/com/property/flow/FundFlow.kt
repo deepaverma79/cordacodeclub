@@ -16,10 +16,10 @@ import net.corda.core.utilities.ProgressTracker
 import net.corda.core.utilities.ProgressTracker.Step
 
 /**
- * This flow allows two parties (the [Initiator] and the [Acceptor]) to come to an agreement about the IOU encapsulated
+ * This flow allows two parties (the [Initiator] and the [Acceptor]) to come to an agreement about the FundState encapsulated
  * within an [FundState].
  *
- * In our simple example, the [Acceptor] always accepts a valid IOU.
+ * In our simple example, the [Acceptor] always accepts a valid FundState.
  *
  * These flows have deliberately been implemented by using only the call() method for ease of understanding. In
  * practice we would recommend splitting up the various stages of the flow into sub-routines.
@@ -29,14 +29,14 @@ import net.corda.core.utilities.ProgressTracker.Step
 object FundFlow {
     @InitiatingFlow
     @StartableByRPC
-    class Initiator(val iouValue: Int,
+    class Initiator(val fundValue: Int,
                     val otherParty: Party) : FlowLogic<SignedTransaction>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
          */
         companion object {
-            object GENERATING_TRANSACTION : Step("Generating transaction based on new IOU.")
+            object GENERATING_TRANSACTION : Step("Generating transaction based on new FundState.")
             object VERIFYING_TRANSACTION : Step("Verifying contract constraints.")
             object SIGNING_TRANSACTION : Step("Signing transaction with our private key.")
             object GATHERING_SIGS : Step("Gathering the counterparty's signature.") {
@@ -69,10 +69,10 @@ object FundFlow {
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
             // Generate an unsigned transaction.
-            val iouState = FundState(iouValue, serviceHub.myInfo.legalIdentities.first(), otherParty)
-            val txCommand = Command(FundContract.Commands.Create(), iouState.participants.map { it.owningKey })
+            val fundState = FundState(fundValue, serviceHub.myInfo.legalIdentities.first(), otherParty)
+            val txCommand = Command(FundContract.Commands.Create(), fundState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(iouState, FUND_CONTRACT_ID)
+                    .addOutputState(fundState, FUND_CONTRACT_ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -105,9 +105,9 @@ object FundFlow {
             val signTransactionFlow = object : SignTransactionFlow(otherPartyFlow) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
                     val output = stx.tx.outputs.single().data
-                    "This must be an IOU transaction." using (output is FundState)
-                    val iou = output as FundState
-                    "I won't accept IOUs with a value over 100." using (iou.value <= 100)
+                    "This must be an FundState transaction." using (output is FundState)
+                    val fundState = output as FundState
+                    "I won't accept FundStates with a value over 100." using (fundState.value <= 100)
                 }
             }
 

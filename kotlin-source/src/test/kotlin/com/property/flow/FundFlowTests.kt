@@ -1,6 +1,5 @@
 package com.property.flow
 
-import com.property.flow.FundFlow
 import com.property.state.FundState
 import net.corda.core.contracts.TransactionVerificationException
 import net.corda.core.node.services.queryBy
@@ -14,7 +13,7 @@ import org.junit.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFailsWith
 
-class IOUFlowTests {
+class FundFlowTests {
     lateinit var network: MockNetwork
     lateinit var a: StartedMockNode
     lateinit var b: StartedMockNode
@@ -35,12 +34,12 @@ class IOUFlowTests {
     }
 
     @Test
-    fun `flow rejects invalid IOUs`() {
+    fun `flow rejects invalid FundStates`() {
         val flow = FundFlow.Initiator(-1, b.info.singleIdentity())
         val future = a.startFlow(flow)
         network.runNetwork()
 
-        // The FundContract specifies that IOUs cannot have negative values.
+        // The FundContract specifies that FundState cannot have negative values.
         assertFailsWith<TransactionVerificationException> { future.getOrThrow() }
     }
 
@@ -78,9 +77,9 @@ class IOUFlowTests {
     }
 
     @Test
-    fun `recorded transaction has no inputs and a single output, the input IOU`() {
-        val iouValue = 1
-        val flow = FundFlow.Initiator(iouValue, b.info.singleIdentity())
+    fun `recorded transaction has no inputs and a single output, the input FundState`() {
+        val fundValue = 1
+        val flow = FundFlow.Initiator(fundValue, b.info.singleIdentity())
         val future = a.startFlow(flow)
         network.runNetwork()
         val signedTx = future.getOrThrow()
@@ -92,27 +91,27 @@ class IOUFlowTests {
             assert(txOutputs.size == 1)
 
             val recordedState = txOutputs[0].data as FundState
-            assertEquals(recordedState.value, iouValue)
+            assertEquals(recordedState.value, fundValue)
             assertEquals(recordedState.fundManager, a.info.singleIdentity())
             assertEquals(recordedState.investor, b.info.singleIdentity())
         }
     }
 
     @Test
-    fun `flow records the correct IOU in both parties' vaults`() {
-        val iouValue = 1
+    fun `flow records the correct FundState in both parties' vaults`() {
+        val fundValue = 1
         val flow = FundFlow.Initiator(1, b.info.singleIdentity())
         val future = a.startFlow(flow)
         network.runNetwork()
         future.getOrThrow()
 
-        // We check the recorded IOU in both vaults.
+        // We check the recorded FundState in both vaults.
         for (node in listOf(a, b)) {
             node.transaction {
-                val ious = node.services.vaultService.queryBy<FundState>().states
-                assertEquals(1, ious.size)
-                val recordedState = ious.single().state.data
-                assertEquals(recordedState.value, iouValue)
+                val fundStates = node.services.vaultService.queryBy<FundState>().states
+                assertEquals(1, fundStates.size)
+                val recordedState = fundStates.single().state.data
+                assertEquals(recordedState.value, fundValue)
                 assertEquals(recordedState.fundManager, a.info.singleIdentity())
                 assertEquals(recordedState.investor, b.info.singleIdentity())
             }

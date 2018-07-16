@@ -1,0 +1,302 @@
+{
+	"info": {
+		"_postman_id": "5bba578e-59c1-4929-b128-1cd86aad995d",
+		"name": "CordaCodeClub",
+		"description": "This is for the Property Investment CordaApp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Notary",
+			"description": "",
+			"item": [
+				{
+					"name": "peers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10015/api/property/peers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10015",
+							"path": [
+								"api",
+								"property",
+								"peers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10015/api/property/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10015",
+							"path": [
+								"api",
+								"property",
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "8ad11ae7-3fde-46fe-99bd-33ec2b6db7fc",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "1f442f49-ac4e-4087-ae5a-1ea5325b9c3b",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "PartyB",
+			"description": "",
+			"item": [
+				{
+					"name": "peers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10012/api/property/peers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10012",
+							"path": [
+								"api",
+								"property",
+								"peers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10012/api/property/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10012",
+							"path": [
+								"api",
+								"property",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "funds",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10012/api/property/peers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10012",
+							"path": [
+								"api",
+								"property",
+								"peers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create-fund",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10012/api/property/create-fund?fundStateValue=100&partyName=\"organisation=PartyC, locality=Paris, country=FR\"",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10012",
+							"path": [
+								"api",
+								"property",
+								"create-fund"
+							],
+							"query": [
+								{
+									"key": "fundStateValue",
+									"value": "100"
+								},
+								{
+									"key": "partyName",
+									"value": "\"organisation=PartyC, locality=Paris, country=FR\""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "my-funds",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10012/api/property/my-funds",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10012",
+							"path": [
+								"api",
+								"property",
+								"my-funds"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "PartyC",
+			"description": "",
+			"item": [
+				{
+					"name": "peers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10009/api/property/peers",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10009",
+							"path": [
+								"api",
+								"property",
+								"peers"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "me",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10009/api/property/me",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10009",
+							"path": [
+								"api",
+								"property",
+								"me"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "funds",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10009/api/property/funds",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10009",
+							"path": [
+								"api",
+								"property",
+								"funds"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "funds Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"url": {
+							"raw": "http://localhost:10009/api/property/my-funds",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "10009",
+							"path": [
+								"api",
+								"property",
+								"my-funds"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

@@ -23,7 +23,7 @@ import javax.ws.rs.core.Response.Status.CREATED
 val SERVICE_NAMES = listOf("Notary", "Network Map Service")
 
 // This API is accessible from /api/example. All paths specified below are relative to it.
-@Path("example")
+@Path("property")
 class FundApi(private val rpcOps: CordaRPCOps) {
     private val myLegalName: CordaX500Name = rpcOps.nodeInfo().legalIdentities.first().name
 
@@ -55,18 +55,18 @@ class FundApi(private val rpcOps: CordaRPCOps) {
     }
 
     /**
-     * Displays all IOU states that exist in the node's vault.
+     * Displays all FundState states that exist in the node's vault.
      */
     @GET
-    @Path("ious")
+    @Path("funds")
     @Produces(MediaType.APPLICATION_JSON)
     fun getFunds() = rpcOps.vaultQueryBy<FundState>().states
 
     /**
-     * Initiates a flow to agree an IOU between two parties.
+     * Initiates a flow to agree an FundState between two parties.
      *
-     * Once the flow finishes it will have written the IOU to ledger. Both the fundManager and the investor will be able to
-     * see it when calling /api/example/ious on their respective nodes.
+     * Once the flow finishes it will have written the FundState to ledger. Both the fundManager and the investor will be able to
+     * see it when calling /api/property/FundStates on their respective nodes.
      *
      * This end-point takes a Party name parameter as part of the path. If the serving node can't find the other party
      * in its network map cache, it will return an HTTP bad request.
@@ -74,10 +74,10 @@ class FundApi(private val rpcOps: CordaRPCOps) {
      * The flow is invoked asynchronously. It returns a future when the flow's call() method returns.
      */
     @PUT
-    @Path("create-iou")
-    fun createFund(@QueryParam("iouValue") iouValue: Int, @QueryParam("partyName") partyName: CordaX500Name?): Response {
-        if (iouValue <= 0 ) {
-            return Response.status(BAD_REQUEST).entity("Query parameter 'iouValue' must be non-negative.\n").build()
+    @Path("create-fund")
+    fun createFund(@QueryParam("fundStateValue") fundStateValue: Int, @QueryParam("partyName") partyName: CordaX500Name?): Response {
+        if (fundStateValue <= 0 ) {
+            return Response.status(BAD_REQUEST).entity("Query parameter 'fundStateValue' must be non-negative.\n").build()
         }
         if (partyName == null) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'partyName' missing or has wrong format.\n").build()
@@ -86,7 +86,7 @@ class FundApi(private val rpcOps: CordaRPCOps) {
                 return Response.status(BAD_REQUEST).entity("Party named $partyName cannot be found.\n").build()
 
         return try {
-            val signedTx = rpcOps.startTrackedFlow(::Initiator, iouValue, otherParty).returnValue.getOrThrow()
+            val signedTx = rpcOps.startTrackedFlow(::Initiator, fundStateValue, otherParty).returnValue.getOrThrow()
             Response.status(CREATED).entity("Transaction id ${signedTx.id} committed to ledger.\n").build()
 
         } catch (ex: Throwable) {
@@ -96,10 +96,10 @@ class FundApi(private val rpcOps: CordaRPCOps) {
     }
 	
 	/**
-     * Displays all IOU states that are created by Party.
+     * Displays all Fund states that are created by Party.
      */
     @GET
-    @Path("my-ious")
+    @Path("my-funds")
     @Produces(MediaType.APPLICATION_JSON)
     fun myfunds(): Response {
         val generalCriteria = QueryCriteria.VaultQueryCriteria(Vault.StateStatus.ALL)
