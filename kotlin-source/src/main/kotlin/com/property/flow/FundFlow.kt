@@ -70,7 +70,7 @@ object FundFlow {
             progressTracker.currentStep = GENERATING_TRANSACTION
             // Generate an unsigned transaction.
             val fundState = FundState(fundValue, serviceHub.myInfo.legalIdentities.first(), otherParty)
-            val txCommand = Command(FundContract.Commands.Create(), fundState.participants.map { it.owningKey })
+            val txCommand = Command(FundContract.Commands.Issue(), fundState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
                     .addOutputState(fundState, FUND_CONTRACT_ID)
                     .addCommand(txCommand)
