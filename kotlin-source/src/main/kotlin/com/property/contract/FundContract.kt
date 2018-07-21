@@ -5,6 +5,7 @@ import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.Requirements.using
 import net.corda.core.contracts.requireSingleCommand
+import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
 import java.security.PublicKey
 
@@ -30,25 +31,20 @@ open class FundContract : Contract {
      * The verify() function of all the states' contracts must not throw an exception for a transaction to be
      * considered valid.
      */
-//    override fun verify(tx: LedgerTransaction) {
-//        val command = tx.commands.requireSingleCommand<Commands.Create>()
-//        requireThat {
-//            // Generic constraints around the Fund transaction.
-//            "No inputs should be consumed when issuing an Fund." using (tx.inputs.isEmpty())
-//            "Only one output state should be created." using (tx.outputs.size == 1)
-//            val out = tx.outputsOfType<FundState>().single()
-//            "The fundManager and the investor cannot be the same entity." using (out.fundManager != out.investor)
-//            "All of the participants must be signers." using (command.signers.containsAll(out.participants.map { it.owningKey }))
-//
-//            // Fund-specific constraints.
-//            "The Fund's value must be non-negative." using (out.value > 0)
-//            "The Fund's value must not be greater than a 10 million." using (out.value < 10000000)
-//        }
-//    }
-
     override fun verify(tx: LedgerTransaction) {
-        val command = tx.commands.requireSingleCommand<Commands>()
-        command.value.verify(tx, command.signers)
+        val command = tx.commands.requireSingleCommand<Commands.Issue>()
+        requireThat {
+            // Generic constraints around the Fund transaction.
+            "No inputs should be consumed when issuing an Fund." using (tx.inputs.isEmpty())
+            "Only one output state should be created." using (tx.outputs.size == 1)
+            val out = tx.outputsOfType<FundState>().single()
+            "The fundManager and the investor cannot be the same entity." using (out.fundManager != out.investor)
+            "All of the participants must be signers." using (command.signers.containsAll(out.participants.map { it.owningKey }))
+
+            // Fund-specific constraints.
+            "The Fund's value must be non-negative." using (out.value > 0)
+            "The Fund's value must not be greater than a 10 million." using (out.value < 10000000)
+        }
     }
 
     interface Commands : CommandData {
