@@ -21,17 +21,17 @@ import net.corda.core.schemas.QueryableState
  */
 data class FundState(val value: Int,
                      val fundManager: Party,
-                     val investor: Party,
+                     val investors: List<Party>,
                      override val linearId: UniqueIdentifier = UniqueIdentifier()):
         LinearState, QueryableState {
     /** The public keys of the involved parties. */
-    override val participants: List<AbstractParty> get() = listOf(fundManager, investor)
+    override val participants: List<AbstractParty> get() = listOf(fundManager) + investors
 
     override fun generateMappedObject(schema: MappedSchema): PersistentState {
         return when (schema) {
             is FundSchemaV1 -> FundSchemaV1.PersistentFundState(
                     this.fundManager.name.toString(),
-                    this.investor.name.toString(),
+                    this.investors.map { it.name.toString() },
                     this.value,
                     this.linearId.id
             )

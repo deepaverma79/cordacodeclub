@@ -26,7 +26,7 @@ object FundSchemaV1 : MappedSchema(
             var fundManager: String,
 
             @Column(name = "investor")
-            var investor: String,
+            var investor: List<String>,
 
             @Column(name = "value")
             var value: Int,
@@ -35,6 +35,6 @@ object FundSchemaV1 : MappedSchema(
             var linearId: UUID
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this("", "", 0, UUID.randomUUID())
+        constructor(): this("", listOf(), 0, UUID.randomUUID())
     }
 }

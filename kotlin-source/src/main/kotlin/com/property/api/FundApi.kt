@@ -13,6 +13,8 @@ import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.node.services.vault.builder
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.loggerFor
+import net.corda.finance.contracts.asset.Cash
+import net.corda.finance.flows.CashIssueFlow
 import org.slf4j.Logger
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
@@ -75,18 +77,19 @@ class FundApi(private val rpcOps: CordaRPCOps) {
      */
     @PUT
     @Path("create-fund")
-    fun createFund(@QueryParam("fundStateValue") fundStateValue: Int, @QueryParam("partyName") partyName: CordaX500Name?): Response {
+    fun createFund(
+            @QueryParam("fundStateValue") fundStateValue: Int,
+            @QueryParam("partyNames") partyNames: List<String>
+    ): Response {
         if (fundStateValue <= 0 ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'fundStateValue' must be non-negative.\n").build()
         }
-        if (partyName == null) {
-            return Response.status(BAD_REQUEST).entity("Query parameter 'partyName' missing or has wrong format.\n").build()
+        val parties = partyNames.map { partyName ->
+            rpcOps.partiesFromName(partyName, false).single()
         }
-        val otherParty = rpcOps.wellKnownPartyFromX500Name(partyName) ?:
-                return Response.status(BAD_REQUEST).entity("Party named $partyName cannot be found.\n").build()
 
         return try {
-            val signedTx = rpcOps.startTrackedFlow(::Initiator, fundStateValue, otherParty).returnValue.getOrThrow()
+            val signedTx = rpcOps.startTrackedFlow(::Initiator, fundStateValue, parties).returnValue.getOrThrow()
             Response.status(CREATED).entity("Transaction id ${signedTx.id} committed to ledger.\n").build()
 
         } catch (ex: Throwable) {

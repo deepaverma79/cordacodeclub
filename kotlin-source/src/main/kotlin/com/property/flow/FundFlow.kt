@@ -30,7 +30,7 @@ object FundFlow {
     @InitiatingFlow
     @StartableByRPC
     class Initiator(val fundValue: Int,
-                    val otherParty: Party) : FlowLogic<SignedTransaction>() {
+                    val parties: List<Party>) : FlowLogic<SignedTransaction>() {
         /**
          * The progress tracker checkpoints each stage of the flow and outputs the specified messages when each
          * checkpoint is reached in the code. See the 'progressTracker.currentStep' expressions within the call() function.
@@ -69,7 +69,7 @@ object FundFlow {
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
             // Generate an unsigned transaction.
-            val fundState = FundState(fundValue, serviceHub.myInfo.legalIdentities.first(), otherParty)
+            val fundState = FundState(fundValue, serviceHub.myInfo.legalIdentities.first(), parties)
             val txCommand = Command(FundContract.Commands.Issue(), fundState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
                     .addOutputState(fundState, FUND_CONTRACT_ID)
@@ -88,8 +88,8 @@ object FundFlow {
             // Stage 4.
             progressTracker.currentStep = GATHERING_SIGS
             // Send the state to the counterparty, and receive it back with their signature.
-            val otherPartyFlow = initiateFlow(otherParty)
-            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, setOf(otherPartyFlow), GATHERING_SIGS.childProgressTracker()))
+            val otherPartyFlows = parties.map { party -> initiateFlow(party) }
+            val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, otherPartyFlows, GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
             progressTracker.currentStep = FINALISING_TRANSACTION
