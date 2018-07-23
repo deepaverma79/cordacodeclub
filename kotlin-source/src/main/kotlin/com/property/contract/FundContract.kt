@@ -38,7 +38,7 @@ open class FundContract : Contract {
             "No inputs should be consumed when issuing an Fund." using (tx.inputs.isEmpty())
             "Only one output state should be created." using (tx.outputs.size == 1)
             val out = tx.outputsOfType<FundState>().single()
-            "The fundManager and the investor cannot be the same entity." using (out.fundManager != out.investor)
+            "The fundManager and the investor cannot be the same entity." using (out.fundManager != out.investors.get(0))
             "All of the participants must be signers." using (command.signers.containsAll(out.participants.map { it.owningKey }))
 
             // Fund-specific constraints.
