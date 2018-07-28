@@ -1,8 +1,11 @@
 package com.property.api
 
-import com.property.flow.FundFlow.Initiator
+import com.property.flow.ChangeOwnerFlow
+import com.property.flow.FundFlow
+import com.property.flow.PropertyFlow
 import com.property.schema.FundSchemaV1
 import com.property.state.FundState
+import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.messaging.startTrackedFlow
@@ -87,7 +90,7 @@ class FundApi(private val rpcOps: CordaRPCOps) {
         }
 
         return try {
-            val signedTx = rpcOps.startTrackedFlow(::Initiator, fundStateValue, parties).returnValue.getOrThrow()
+            val signedTx = rpcOps.startTrackedFlow(FundFlow::Initiator, fundStateValue, parties).returnValue.getOrThrow()
             Response.status(CREATED).entity("Transaction id ${signedTx.id} committed to ledger.\n").build()
 
         } catch (ex: Throwable) {
@@ -95,7 +98,57 @@ class FundApi(private val rpcOps: CordaRPCOps) {
             Response.status(BAD_REQUEST).entity(ex.message!!).build()
         }
     }
-	
+
+    @PUT
+    @Path("sell-fund-share")
+    fun changeFundInvestors(
+            @QueryParam("currentInvestor") currentInvestor: String,
+            @QueryParam("newInvestor") newInvestor: String,
+            @QueryParam("fundId") fundId: UniqueIdentifier
+    ): Response {
+        if (currentInvestor == null ) {
+            return Response.status(BAD_REQUEST).entity("Query parameter 'currentInvestor' must be present.\n").build()
+        }
+        if (newInvestor == null ) {
+            return Response.status(BAD_REQUEST).entity("Query parameter 'newInvestor' must be present.\n").build()
+        }
+        val newInvestor = rpcOps.partiesFromName(newInvestor, false).single()
+        val currentInvestor = rpcOps.partiesFromName(currentInvestor, false).single()
+
+        return try {
+            val signedTx = rpcOps.startTrackedFlow(ChangeOwnerFlow::Initiator, currentInvestor, newInvestor, fundId).returnValue.getOrThrow()
+            Response.status(CREATED).entity("Property id ${signedTx.id} committed to ledger.\n").build()
+
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            Response.status(BAD_REQUEST).entity(ex.message!!).build()
+        }
+    }
+
+
+    @PUT
+    @Path("register-property")
+    fun createFund(
+            @QueryParam("address") address: String,
+            @QueryParam("propertyManager") propertyManager: String
+    ): Response {
+        if (address == null ) {
+            return Response.status(BAD_REQUEST).entity("Query parameter 'address' must be present.\n").build()
+        }
+        if (propertyManager == null ) {
+            return Response.status(BAD_REQUEST).entity("Query parameter 'propertyManager' must be present.\n").build()
+        }
+        val party = rpcOps.partiesFromName(propertyManager, false).single()
+        return try {
+            val signedTx = rpcOps.startTrackedFlow(PropertyFlow::Initiator, address, party).returnValue.getOrThrow()
+            Response.status(CREATED).entity("Property id ${signedTx.id} committed to ledger.\n").build()
+
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            Response.status(BAD_REQUEST).entity(ex.message!!).build()
+        }
+    }
+
 	/**
      * Displays all Fund states that are created by Party.
      */

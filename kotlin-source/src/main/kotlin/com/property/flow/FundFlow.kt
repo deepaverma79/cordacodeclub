@@ -107,7 +107,7 @@ object FundFlow {
                     val output = stx.tx.outputs.single().data
                     "This must be an FundState transaction." using (output is FundState)
                     val fundState = output as FundState
-                    "I won't accept FundStates with a value over 100." using (fundState.value <= 100)
+                    "I won't accept FundStates with a value over 100000." using (fundState.value <= 100000)
                 }
             }
 
