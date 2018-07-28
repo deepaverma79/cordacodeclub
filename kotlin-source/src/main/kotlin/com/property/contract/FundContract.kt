@@ -90,19 +90,7 @@ open class FundContract : Contract {
             }
         }
 
-        class Amend : Commands {
-            companion object {
-                val CONTRACT_RULE_INPUTS = "Only one input should be consumed when amending an invoice."
-                val CONTRACT_RULE_OUTPUTS = "Only one output should be created when amending an invoice."
-            }
-
-            override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
-                // Transaction Rules
-                CONTRACT_RULE_INPUTS using (tx.inputs.size == 1)
-                CONTRACT_RULE_OUTPUTS using (tx.outputs.size == 1)
-            }
-        }
-
+        //When a fund is cancelled the investors are then paid
         class Cancel : Commands {
             companion object {
                 val CONTRACT_RULE_INPUTS = "Only one input should be consumed when cancelling an invoice."

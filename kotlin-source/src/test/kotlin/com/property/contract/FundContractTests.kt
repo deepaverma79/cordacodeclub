@@ -19,7 +19,7 @@ class FundContractTests {
         val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, listOf(megaCorp.party)))
                 fails()
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Issue())
                 verifies()
@@ -32,8 +32,8 @@ class FundContractTests {
         val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                input(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
-                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
+                input(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, listOf(megaCorp.party)))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, listOf(megaCorp.party)))
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Issue())
                 `fails with`("No inputs should be consumed when issuing an Fund.")
             }
@@ -45,8 +45,8 @@ class FundContractTests {
         val fundValue = 1
         ledgerServices.ledger {
             transaction {
-                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
-                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, megaCorp.party))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, listOf(megaCorp.party)))
+                output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, listOf(megaCorp.party)))
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Issue())
                 `fails with`("Only one output state should be created.")
             }

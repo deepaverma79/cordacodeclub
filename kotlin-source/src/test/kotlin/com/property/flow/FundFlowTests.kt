@@ -2,6 +2,7 @@ package com.property.flow
 
 import com.property.state.FundState
 import net.corda.core.contracts.TransactionVerificationException
+import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy
 import net.corda.core.utilities.getOrThrow
 import net.corda.testing.core.singleIdentity
@@ -35,7 +36,7 @@ class FundFlowTests {
 
     @Test
     fun `flow rejects invalid FundStates`() {
-        val flow = FundFlow.Initiator(-1, b.info.singleIdentity())
+        val flow = FundFlow.Initiator(-1, listOf(b.info.singleIdentity()))
         val future = a.startFlow(flow)
         network.runNetwork()
 
@@ -45,7 +46,7 @@ class FundFlowTests {
 
     @Test
     fun `SignedTransaction returned by the flow is signed by the initiator`() {
-        val flow = FundFlow.Initiator(1, b.info.singleIdentity())
+        val flow = FundFlow.Initiator(1, listOf(b.info.singleIdentity()))
         val future = a.startFlow(flow)
         network.runNetwork()
 
@@ -55,7 +56,7 @@ class FundFlowTests {
 
     @Test
     fun `SignedTransaction returned by the flow is signed by the acceptor`() {
-        val flow = FundFlow.Initiator(1, b.info.singleIdentity())
+        val flow = FundFlow.Initiator(1, listOf(b.info.singleIdentity()))
         val future = a.startFlow(flow)
         network.runNetwork()
 
@@ -65,7 +66,7 @@ class FundFlowTests {
 
     @Test
     fun `flow records a transaction in both parties' transaction storages`() {
-        val flow = FundFlow.Initiator(1, b.info.singleIdentity())
+        val flow = FundFlow.Initiator(1, listOf(b.info.singleIdentity()))
         val future = a.startFlow(flow)
         network.runNetwork()
         val signedTx = future.getOrThrow()
@@ -79,7 +80,7 @@ class FundFlowTests {
     @Test
     fun `recorded transaction has no inputs and a single output, the input FundState`() {
         val fundValue = 1
-        val flow = FundFlow.Initiator(fundValue, b.info.singleIdentity())
+        val flow = FundFlow.Initiator(fundValue, listOf(b.info.singleIdentity()))
         val future = a.startFlow(flow)
         network.runNetwork()
         val signedTx = future.getOrThrow()
@@ -93,14 +94,14 @@ class FundFlowTests {
             val recordedState = txOutputs[0].data as FundState
             assertEquals(recordedState.value, fundValue)
             assertEquals(recordedState.fundManager, a.info.singleIdentity())
-            assertEquals(recordedState.investor, b.info.singleIdentity())
+            assertEquals(recordedState.investors, listOf(b.info.singleIdentity()))
         }
     }
 
     @Test
     fun `flow records the correct FundState in both parties' vaults`() {
         val fundValue = 1
-        val flow = FundFlow.Initiator(1, b.info.singleIdentity())
+        val flow = FundFlow.Initiator(1, listOf(b.info.singleIdentity()))
         val future = a.startFlow(flow)
         network.runNetwork()
         future.getOrThrow()
@@ -113,7 +114,7 @@ class FundFlowTests {
                 val recordedState = fundStates.single().state.data
                 assertEquals(recordedState.value, fundValue)
                 assertEquals(recordedState.fundManager, a.info.singleIdentity())
-                assertEquals(recordedState.investor, b.info.singleIdentity())
+                assertEquals(recordedState.investors, listOf<Party>(b.info.singleIdentity()))
             }
         }
     }

@@ -4,6 +4,7 @@ import net.corda.core.schemas.MappedSchema
 import net.corda.core.schemas.PersistentState
 import java.util.*
 import javax.persistence.Column
+import javax.persistence.ElementCollection
 import javax.persistence.Entity
 import javax.persistence.Table
 
@@ -25,8 +26,9 @@ object FundSchemaV1 : MappedSchema(
             @Column(name = "fundManager")
             var fundManager: String,
 
-            @Column(name = "investor")
-            var investor: List<String>,
+            @Column(name = "investors")
+            @ElementCollection
+            var investors: List<String>,
 
             @Column(name = "value")
             var value: Int,

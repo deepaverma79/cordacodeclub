@@ -31,7 +31,7 @@ data class FundState(val value: Int,
         return when (schema) {
             is FundSchemaV1 -> FundSchemaV1.PersistentFundState(
                     this.fundManager.name.toString(),
-                    this.investors.map { it.name.toString() },
+                    this.investors.map { p -> p.name.toString() },
                     this.value,
                     this.linearId.id
             )
