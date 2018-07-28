@@ -110,7 +110,6 @@ object FundFlow {
                     "I won't accept FundStates with a value over 100000." using (fundState.value <= 100000)
                 }
             }
-
             return subFlow(signTransactionFlow)
         }
     }

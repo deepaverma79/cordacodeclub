@@ -1,6 +1,7 @@
 package com.property.api
 
 import com.property.flow.ChangeOwnerFlow
+import com.property.flow.DividendFlow
 import com.property.flow.FundFlow
 import com.property.flow.PropertyFlow
 import com.property.schema.FundSchemaV1
@@ -99,6 +100,7 @@ class FundApi(private val rpcOps: CordaRPCOps) {
         }
     }
 
+    // TODO : Unique Identifier doesnt work with the REST URL
     @PUT
     @Path("sell-fund-share")
     fun changeFundInvestors(
@@ -125,6 +127,29 @@ class FundApi(private val rpcOps: CordaRPCOps) {
         }
     }
 
+
+    @PUT
+    @Path("pay-dividend")
+    fun payDividend(
+            @QueryParam("amount") amount: Int,
+            @QueryParam("fundId") fundId: UniqueIdentifier
+    ): Response {
+        if (amount == null ) {
+            return Response.status(BAD_REQUEST).entity("Specify the amount to be paid as dividend.\n").build()
+        }
+        if (fundId == null ) {
+            return Response.status(BAD_REQUEST).entity("Query parameter 'fundId' must be present.\n").build()
+        }
+      // TODO : GET fund from FundId
+        return try {
+            val signedTx = rpcOps.startTrackedFlow(DividendFlow::Initiator, amount, fundId).returnValue.getOrThrow()
+            Response.status(CREATED).entity("Property id ${signedTx.id} committed to ledger.\n").build()
+
+        } catch (ex: Throwable) {
+            logger.error(ex.message, ex)
+            Response.status(BAD_REQUEST).entity(ex.message!!).build()
+        }
+    }
 
     @PUT
     @Path("register-property")

@@ -70,9 +70,9 @@ open class FundContract : Contract {
 
         class ChangeOwner : Commands {
             companion object {
-                val CONTRACT_RULE_INPUTS = "At least one input should be consumed when changing ownership of an invoice."
-                val CONTRACT_RULE_OUTPUTS = "At least one output should be created when changing ownership of an invoice."
-                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when changing ownership of an invoice."
+                val CONTRACT_RULE_INPUTS = "At least one input should be consumed when changing ownership."
+                val CONTRACT_RULE_OUTPUTS = "At least one output should be created when changing ownership."
+                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when changing ownership."
             }
 
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
