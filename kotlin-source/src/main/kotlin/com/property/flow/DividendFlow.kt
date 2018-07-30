@@ -6,6 +6,7 @@ import com.property.state.DividendState
 import com.property.state.FundState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
+import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
@@ -91,6 +92,19 @@ object DividendFlow {
             progressTracker.currentStep = DividendFlow.Initiator.Companion.FINALISING_TRANSACTION
             // Notarise and record the transaction in both parties' vaults.
             return subFlow(FinalityFlow(fullySignedTx, DividendFlow.Initiator.Companion.FINALISING_TRANSACTION.childProgressTracker()))
+        }
+    }
+
+    @InitiatedBy(Initiator::class)
+    class Acceptor(val otherPartyFlow: FlowSession) : FlowLogic<SignedTransaction>() {
+        @Suspendable
+        override fun call(): SignedTransaction {
+            val signTransactionFlow = object : SignTransactionFlow(otherPartyFlow) {
+                override fun checkTransaction(stx: SignedTransaction) = requireThat {
+
+                }
+            }
+            return subFlow(signTransactionFlow)
         }
     }
 }

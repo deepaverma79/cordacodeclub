@@ -5,7 +5,6 @@ import com.property.flow.ChangeOwnerFlow
 import com.property.flow.DividendFlow
 import com.property.flow.FundFlow
 import com.property.flow.PropertyFlow
-import com.property.schema.FundSchemaV1
 import com.property.state.FundState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.CordaX500Name
@@ -13,9 +12,6 @@ import net.corda.core.messaging.CordaRPCOps
 import net.corda.core.messaging.startTrackedFlow
 import net.corda.core.messaging.vaultQueryBy
 import net.corda.core.node.services.IdentityService
-import net.corda.core.node.services.Vault
-import net.corda.core.node.services.vault.QueryCriteria
-import net.corda.core.node.services.vault.builder
 import net.corda.core.utilities.getOrThrow
 import net.corda.core.utilities.loggerFor
 import org.slf4j.Logger
@@ -185,13 +181,7 @@ class FundApi(private val rpcOps: CordaRPCOps) {
     @Path("my-funds")
     @Produces(MediaType.APPLICATION_JSON)
     fun myfunds(): Response {
-        val generalCriteria = QueryCriteria.VaultQueryCriteria(Vault.StateStatus.ALL)
-        val results = builder {
-                val partyType = FundSchemaV1.PersistentFundState::fundManager.equal(rpcOps.nodeInfo().legalIdentities.first().name.toString())
-                val customCriteria = QueryCriteria.VaultCustomQueryCriteria(partyType)
-                val criteria = generalCriteria.and(customCriteria)
-                val results = rpcOps.vaultQueryBy<FundState>(criteria).states
-                return Response.ok(results).build()
-        }
+        val funds = rpcOps.vaultQueryBy<FundState>().states
+        return Response.ok(funds).build()
     }
 }

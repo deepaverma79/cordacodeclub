@@ -32,19 +32,8 @@ open class FundContract : Contract {
      * considered valid.
      */
     override fun verify(tx: LedgerTransaction) {
-        val command = tx.commands.requireSingleCommand<Commands.Issue>()
-        requireThat {
-            // Generic constraints around the Fund transaction.
-            "No inputs should be consumed when issuing an Fund." using (tx.inputs.isEmpty())
-            "Only one output state should be created." using (tx.outputs.size == 1)
-            val out = tx.outputsOfType<FundState>().single()
-            "The fundManager and the investor cannot be the same entity." using (out.fundManager != out.investors[0])
-            "All of the participants must be signers." using (command.signers.containsAll(out.participants.map { it.owningKey }))
-
-            // Fund-specific constraints.
-            "The Fund's value must be non-negative." using (out.value > 0)
-            "The Fund's value must not be greater than a 10 million." using (out.value < 10000000)
-        }
+        val command = tx.commands.requireSingleCommand<Commands>()
+        command.value.verify(tx, command.signers)
     }
 
     interface Commands : CommandData {
@@ -72,7 +61,7 @@ open class FundContract : Contract {
             companion object {
                 val CONTRACT_RULE_INPUTS = "At least one input should be consumed when changing ownership."
                 val CONTRACT_RULE_OUTPUTS = "At least one output should be created when changing ownership."
-                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when changing ownership."
+                val CONTRACT_RULE_SIGNERS = "Fund manager, input owner and output owner are required to sign when changing ownership."
             }
 
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
@@ -81,10 +70,13 @@ open class FundContract : Contract {
                 CONTRACT_RULE_OUTPUTS using (tx.outputs.isNotEmpty())
 
                 // State Rules
-                val keys = tx.outputsOfType<FundState>()
-                        .flatMap { it.participants }
-                        .map { it.owningKey }
-                        .distinct()
+                val input = tx.inputsOfType<FundState>().single()
+                val output = tx.outputsOfType<FundState>().single()
+                val newInvestor = output.investors.find { investor -> investor !in input.investors }!!
+                val oldInvestor = input.investors.find { investor -> investor !in output.investors }!!
+
+                val requiredSigners = listOf(input.fundManager, newInvestor, oldInvestor)
+                val keys = requiredSigners.map { it.owningKey }
 
                 CONTRACT_RULE_SIGNERS using signers.containsAll(keys)
             }
