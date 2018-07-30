@@ -88,7 +88,7 @@ object FundFlow {
             // Stage 4.
             progressTracker.currentStep = GATHERING_SIGS
             // Send the state to the counterparty, and receive it back with their signature.
-            val otherPartyFlows = parties.map { party -> initiateFlow(party) }
+            val otherPartyFlows = parties.filter { party -> party != ourIdentity }.map { party -> initiateFlow(party) }
             val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, otherPartyFlows, GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.

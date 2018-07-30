@@ -81,10 +81,10 @@ class FundApi(private val rpcOps: CordaRPCOps) {
     @PUT
     @Path("create-fund")
     fun createFund(
-            @QueryParam("fundStateValue") fundStateValue: Int,
+            @QueryParam("fundStateValue") fundStateValue: Int?,
             @QueryParam("partyNames") partyNames: List<String>
     ): Response {
-        if (fundStateValue <= 0 ) {
+        if (fundStateValue == null) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'fundStateValue' must be non-negative.\n").build()
         }
         val parties = partyNames.map { partyName ->
