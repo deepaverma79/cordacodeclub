@@ -3,12 +3,9 @@ package com.property.flow
 import co.paralleluniverse.fibers.Suspendable
 import com.property.contract.FundContract
 import com.property.contract.FundContract.Companion.FUND_CONTRACT_ID
-import com.property.flow.FundFlow.Acceptor
-import com.property.flow.FundFlow.Initiator
 import com.property.state.FundState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
-import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy

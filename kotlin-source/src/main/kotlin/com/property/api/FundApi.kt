@@ -1,5 +1,6 @@
 package com.property.api
 
+//import com.property.flow.ChangeOwnerFlow
 import com.property.flow.ChangeOwnerFlow
 import com.property.flow.DividendFlow
 import com.property.flow.FundFlow
@@ -104,9 +105,9 @@ class FundApi(private val rpcOps: CordaRPCOps) {
     @PUT
     @Path("sell-fund-share")
     fun changeFundInvestors(
-            @QueryParam("currentInvestor") currentInvestor: String,
-            @QueryParam("newInvestor") newInvestor: String,
-            @QueryParam("fundId") fundId: UniqueIdentifier
+            @QueryParam("currentInvestor") currentInvestor: String?,
+            @QueryParam("newInvestor") newInvestor: String?,
+            @QueryParam("fundId") fundIdString: String?
     ): Response {
         if (currentInvestor == null ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'currentInvestor' must be present.\n").build()
@@ -114,8 +115,12 @@ class FundApi(private val rpcOps: CordaRPCOps) {
         if (newInvestor == null ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'newInvestor' must be present.\n").build()
         }
+        if (fundIdString == null ) {
+            return Response.status(BAD_REQUEST).entity("Query parameter 'fundId' must be present.\n").build()
+        }
         val newInvestor = rpcOps.partiesFromName(newInvestor, false).single()
         val currentInvestor = rpcOps.partiesFromName(currentInvestor, false).single()
+        val fundId = UniqueIdentifier.fromString(fundIdString)
 
         return try {
             val signedTx = rpcOps.startTrackedFlow(ChangeOwnerFlow::Initiator, currentInvestor, newInvestor, fundId).returnValue.getOrThrow()
@@ -127,20 +132,19 @@ class FundApi(private val rpcOps: CordaRPCOps) {
         }
     }
 
-
     @PUT
     @Path("pay-dividend")
     fun payDividend(
-            @QueryParam("amount") amount: Int,
-            @QueryParam("fundId") fundId: UniqueIdentifier
+            @QueryParam("amount") amount: Int?,
+            @QueryParam("fundId") fundIdString: String?
     ): Response {
         if (amount == null ) {
             return Response.status(BAD_REQUEST).entity("Specify the amount to be paid as dividend.\n").build()
         }
-        if (fundId == null ) {
+        if (fundIdString == null ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'fundId' must be present.\n").build()
         }
-      // TODO : GET fund from FundId
+        val fundId = UniqueIdentifier.fromString(fundIdString)
         return try {
             val signedTx = rpcOps.startTrackedFlow(DividendFlow::Initiator, amount, fundId).returnValue.getOrThrow()
             Response.status(CREATED).entity("Property id ${signedTx.id} committed to ledger.\n").build()
@@ -154,8 +158,8 @@ class FundApi(private val rpcOps: CordaRPCOps) {
     @PUT
     @Path("register-property")
     fun createFund(
-            @QueryParam("address") address: String,
-            @QueryParam("propertyManager") propertyManager: String
+            @QueryParam("address") address: String?,
+            @QueryParam("propertyManager") propertyManager: String?
     ): Response {
         if (address == null ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'address' must be present.\n").build()
