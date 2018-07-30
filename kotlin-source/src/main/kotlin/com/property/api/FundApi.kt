@@ -105,21 +105,21 @@ class FundApi(private val rpcOps: CordaRPCOps) {
     @PUT
     @Path("sell-fund-share")
     fun changeFundInvestors(
-            @QueryParam("currentInvestor") currentInvestor: String?,
-            @QueryParam("newInvestor") newInvestor: String?,
+            @QueryParam("currentInvestor") currentInvestorString: String?,
+            @QueryParam("newInvestor") newInvestorString: String?,
             @QueryParam("fundId") fundIdString: String?
     ): Response {
-        if (currentInvestor == null ) {
+        if (currentInvestorString == null ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'currentInvestor' must be present.\n").build()
         }
-        if (newInvestor == null ) {
+        if (newInvestorString == null ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'newInvestor' must be present.\n").build()
         }
         if (fundIdString == null ) {
             return Response.status(BAD_REQUEST).entity("Query parameter 'fundId' must be present.\n").build()
         }
-        val newInvestor = rpcOps.partiesFromName(newInvestor, false).single()
-        val currentInvestor = rpcOps.partiesFromName(currentInvestor, false).single()
+        val newInvestor = rpcOps.partiesFromName(newInvestorString, false).single()
+        val currentInvestor = rpcOps.partiesFromName(currentInvestorString, false).single()
         val fundId = UniqueIdentifier.fromString(fundIdString)
 
         return try {
@@ -187,7 +187,7 @@ class FundApi(private val rpcOps: CordaRPCOps) {
     fun myfunds(): Response {
         val generalCriteria = QueryCriteria.VaultQueryCriteria(Vault.StateStatus.ALL)
         val results = builder {
-                var partyType = FundSchemaV1.PersistentFundState::fundManager.equal(rpcOps.nodeInfo().legalIdentities.first().name.toString())
+                val partyType = FundSchemaV1.PersistentFundState::fundManager.equal(rpcOps.nodeInfo().legalIdentities.first().name.toString())
                 val customCriteria = QueryCriteria.VaultCustomQueryCriteria(partyType)
                 val criteria = generalCriteria.and(customCriteria)
                 val results = rpcOps.vaultQueryBy<FundState>(criteria).states

@@ -17,7 +17,7 @@ import net.corda.core.schemas.QueryableState
  *
  * @param value the value of the FundState.
  * @param fundManager the party issuing the FundState.
- * @param investor the party receiving and approving the FundState.
+ * @param investors the parties receiving and approving the FundState.
  */
 data class FundState(val value: Int,
                      val fundManager: Party,
@@ -32,7 +32,7 @@ data class FundState(val value: Int,
             is FundSchemaV1 -> FundSchemaV1.PersistentFundState(
                     this.fundManager.name.toString(),
                     // TODO : THIS NEEDS TO BE A LIST
-                    this.investors.get(0).toString(),
+                    this.investors[0].toString(),
                     this.value,
                     this.linearId.id
             )

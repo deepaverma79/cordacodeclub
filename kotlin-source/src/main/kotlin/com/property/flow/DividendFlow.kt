@@ -2,9 +2,7 @@ package com.property.flow
 
 import co.paralleluniverse.fibers.Suspendable
 import com.property.contract.DividendContract
-import com.property.contract.DividendTokenContract
 import com.property.state.DividendState
-import com.property.state.DividendToken
 import com.property.state.FundState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
