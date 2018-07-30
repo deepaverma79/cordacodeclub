@@ -2,9 +2,9 @@ package com.property.state
 
 import net.corda.core.contracts.LinearState
 import net.corda.core.contracts.UniqueIdentifier
-import net.corda.core.identity.AbstractParty
 import net.corda.core.identity.Party
 
-class PropertyState(val owner: Party, val address: String, override val linearId: UniqueIdentifier) : LinearState {
+data class PropertyState(val owner: Party, val address: String,
+                    override val linearId: UniqueIdentifier = UniqueIdentifier()) : LinearState {
     override val participants = listOf(owner)
 }

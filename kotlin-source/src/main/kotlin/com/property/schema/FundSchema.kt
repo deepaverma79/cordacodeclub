@@ -3,10 +3,7 @@ package com.property.schema
 import net.corda.core.schemas.MappedSchema
 import net.corda.core.schemas.PersistentState
 import java.util.*
-import javax.persistence.Column
-import javax.persistence.ElementCollection
-import javax.persistence.Entity
-import javax.persistence.Table
+import javax.persistence.*
 
 /**
  * The family of schemas for FundState.
@@ -27,8 +24,11 @@ object FundSchemaV1 : MappedSchema(
             var fundManager: String,
 
             @Column(name = "investors")
-            @ElementCollection
-            var investors: List<String>,
+// TODO : DV: This has to be ManyToManyRelationship
+//            @ManyToMany
+//            @CollectionTable(name = "Investors", joinColumns = arrayOf(JoinColumn(name = "investor_id")))
+//            var investors: List<String>,
+            var investors: String,
 
             @Column(name = "value")
             var value: Int,
@@ -37,6 +37,6 @@ object FundSchemaV1 : MappedSchema(
             var linearId: UUID
     ) : PersistentState() {
         // Default constructor required by hibernate.
-        constructor(): this("", listOf(), 0, UUID.randomUUID())
+        constructor(): this("", ""/*listOf()*/, 0, UUID.randomUUID())
     }
 }

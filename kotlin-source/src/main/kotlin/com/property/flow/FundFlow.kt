@@ -88,7 +88,7 @@ object FundFlow {
             // Stage 4.
             progressTracker.currentStep = GATHERING_SIGS
             // Send the state to the counterparty, and receive it back with their signature.
-            val otherPartyFlows = parties.map { party -> initiateFlow(party) }
+            val otherPartyFlows = parties.filter { party -> party != ourIdentity }.map { party -> initiateFlow(party) }
             val fullySignedTx = subFlow(CollectSignaturesFlow(partSignedTx, otherPartyFlows, GATHERING_SIGS.childProgressTracker()))
 
             // Stage 5.
@@ -107,10 +107,9 @@ object FundFlow {
                     val output = stx.tx.outputs.single().data
                     "This must be an FundState transaction." using (output is FundState)
                     val fundState = output as FundState
-                    "I won't accept FundStates with a value over 100." using (fundState.value <= 100)
+                    "I won't accept FundStates with a value over 100000." using (fundState.value <= 100000)
                 }
             }
-
             return subFlow(signTransactionFlow)
         }
     }
