@@ -35,7 +35,7 @@ class FundContractTests {
                 input(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, listOf(megaCorp.party)))
                 output(FUND_CONTRACT_ID, FundState(fundValue, miniCorp.party, listOf(megaCorp.party)))
                 command(listOf(megaCorp.publicKey, miniCorp.publicKey), FundContract.Commands.Issue())
-                `fails with`("No inputs should be consumed when issuing an Fund.")
+                `fails with`("Zero inputs should be consumed when issuing an Fund.")
             }
         }
     }

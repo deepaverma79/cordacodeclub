@@ -41,8 +41,8 @@ open class FundContract : Contract {
 
         class Issue : Commands {
             companion object {
-                val CONTRACT_RULE_INPUTS = "Zero inputs should be consumed when issuing an invoice."
-                val CONTRACT_RULE_OUTPUTS = "Only one output should be created when issuing an invoice."
+                val CONTRACT_RULE_INPUTS = "Zero inputs should be consumed when issuing an Fund."
+                val CONTRACT_RULE_OUTPUTS = "Only one output state should be created."
                 val CONTRACT_RULE_SIGNERS = "All participants are required to sign when issuing an invoice."
             }
 
