@@ -54,6 +54,10 @@ open class FundContract : Contract {
                 // State Rules
                 val outputState = tx.outputsOfType<FundState>().single()
                 CONTRACT_RULE_SIGNERS using (signers.containsAll(outputState.participants.map { it.owningKey }))
+
+                // Fund-specific constraints.
+                "The Fund's value must be non-negative." using (outputState.value > 0)
+
             }
         }
 
