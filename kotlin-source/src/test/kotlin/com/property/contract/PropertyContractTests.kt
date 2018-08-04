@@ -47,7 +47,7 @@ class PropertyContractTests {
                 output(PROPERTY_CONTRACT_ID, PropertyState(address, megaCorp.party))
                 output(PROPERTY_CONTRACT_ID, PropertyState(address, megaCorp.party))
                 command(listOf(megaCorp.publicKey), PropertyContract.Commands.Register())
-                `fails with`("Only one output state should be created.")
+                `fails with`("Only one output should be created when registering a property.")
             }
         }
     }
@@ -59,7 +59,7 @@ class PropertyContractTests {
             transaction {
                 output(PROPERTY_CONTRACT_ID, PropertyState(address,  megaCorp.party))
                 command(listOf(miniCorp.publicKey), PropertyContract.Commands.Register())
-                `fails with`("Property Manager must be the signer.")
+                `fails with`("All participants are required to sign when registering a property.")
             }
         }
     }

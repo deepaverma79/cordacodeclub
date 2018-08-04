@@ -1,6 +1,5 @@
 package com.property.contract
 
-import com.property.state.FundState
 import com.property.state.PropertyState
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
@@ -22,15 +21,11 @@ open class PropertyContract : Contract {
      * considered valid.
      */
     override fun verify(tx: LedgerTransaction) {
-        val command = tx.commands.requireSingleCommand<Commands.Register>()
+        val command = tx.commands.requireSingleCommand<PropertyContract.Commands>()
+        command.value.verify(tx, command.signers)
         requireThat {
-            // Generic constraints around the Fund transaction.
-            "No inputs should be consumed registering a Property." using (tx.inputs.isEmpty())
-            "Only one output state should be created." using (tx.outputs.size == 1)
+            // Generic constraints around the Property transaction.
             val out = tx.outputsOfType<PropertyState>().single()
-            "Property Manager must be the signer." using (command.signers.containsAll(out.participants.map { it.owningKey }))
-
-            // Registration-specific constraints.
             "The Property address cannot be empty." using (out.address != "" )
             "The Property must have an associated fund manager" using (out.participants.isNotEmpty())
         }
@@ -42,11 +37,10 @@ open class PropertyContract : Contract {
         class Register : Commands {
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                "Zero inputs should be consumed when registering a property." using (tx.inputs.isEmpty())
+                "No inputs should be consumed registering a Property." using (tx.inputs.isEmpty())
                 "Only one output should be created when registering a property." using (tx.outputs.size == 1)
-
                 // State Rules
-                val outputState = tx.outputsOfType<FundState>().single()
+                val outputState = tx.outputsOfType<PropertyState>().single()
                 "All participants are required to sign when registering a property." using (signers.containsAll(outputState.participants.map { it.owningKey }))
             }
         }
