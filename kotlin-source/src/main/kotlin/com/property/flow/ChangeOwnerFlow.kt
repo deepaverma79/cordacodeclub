@@ -99,7 +99,6 @@ object ChangeOwnerFlow {
         override fun call(): SignedTransaction {
             val signTransactionFlow = object : SignTransactionFlow(otherPartyFlow) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
-
                 }
             }
             return subFlow(signTransactionFlow)

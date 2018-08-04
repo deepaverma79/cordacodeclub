@@ -24,7 +24,7 @@ object FundSchemaV1 : MappedSchema(
             var fundManager: String,
 
             @Column(name = "investors")
-// TODO : DV: This has to be ManyToManyRelationship
+// TODO : This has to be ManyToManyRelationship
 //            @ManyToMany
 //            @CollectionTable(name = "Investors", joinColumns = arrayOf(JoinColumn(name = "investor_id")))
 //            var investors: List<String>,

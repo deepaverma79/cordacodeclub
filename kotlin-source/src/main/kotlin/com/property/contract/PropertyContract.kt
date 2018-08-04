@@ -40,34 +40,22 @@ open class PropertyContract : Contract {
         fun verify(tx: LedgerTransaction, signers: List<PublicKey>)
 
         class Register : Commands {
-            companion object {
-                val CONTRACT_RULE_INPUTS = "Zero inputs should be consumed when registering a property."
-                val CONTRACT_RULE_OUTPUTS = "Only one output should be created when registering a property."
-                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when registering a property."
-            }
-
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                CONTRACT_RULE_INPUTS using (tx.inputs.isEmpty())
-                CONTRACT_RULE_OUTPUTS using (tx.outputs.size == 1)
+                "Zero inputs should be consumed when registering a property." using (tx.inputs.isEmpty())
+                "Only one output should be created when registering a property." using (tx.outputs.size == 1)
 
                 // State Rules
                 val outputState = tx.outputsOfType<FundState>().single()
-                CONTRACT_RULE_SIGNERS using (signers.containsAll(outputState.participants.map { it.owningKey }))
+                "All participants are required to sign when registering a property." using (signers.containsAll(outputState.participants.map { it.owningKey }))
             }
         }
 
         class ChangePropertyManager : Commands {
-            companion object {
-                val CONTRACT_RULE_INPUTS = "At least one input should be consumed when changing ownership of a property."
-                val CONTRACT_RULE_OUTPUTS = "At least one output should be created when changing ownership of a property."
-                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when changing ownership of a property."
-            }
-
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                CONTRACT_RULE_INPUTS using (tx.inputs.isNotEmpty())
-                CONTRACT_RULE_OUTPUTS using (tx.outputs.isNotEmpty())
+                "At least one input should be consumed when changing ownership of a property." using (tx.inputs.isNotEmpty())
+                "At least one output should be created when changing ownership of a property." using (tx.outputs.isNotEmpty())
 
                 // State Rules
                 val keys = tx.outputsOfType<PropertyState>()
@@ -75,20 +63,15 @@ open class PropertyContract : Contract {
                         .map { it.owningKey }
                         .distinct()
 
-                CONTRACT_RULE_SIGNERS using signers.containsAll(keys)
+                "All participants are required to sign when changing ownership of a property." using signers.containsAll(keys)
             }
         }
 
         class Deregister : Commands {
-            companion object {
-                val CONTRACT_RULE_INPUTS = "Only one input should be consumed when cancelling a property registration."
-                val CONTRACT_RULE_OUTPUTS = "Zero outputs should be created when cancelling  a property registration."
-            }
-
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                CONTRACT_RULE_INPUTS using (tx.inputs.size == 1)
-                CONTRACT_RULE_OUTPUTS using (tx.outputs.isEmpty())
+                "Only one input should be consumed when cancelling a property registration." using (tx.inputs.size == 1)
+                "Zero outputs should be created when cancelling  a property registration." using (tx.outputs.isEmpty())
             }
         }
     }

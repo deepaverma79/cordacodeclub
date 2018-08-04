@@ -16,42 +16,23 @@ open class DividendContract : Contract {
         val DIVIDEND_CONTRACT_ID = "com.property.contract.DividendContract"
     }
 
-    /**
-     * The verify() function of all the states' contracts must not throw an exception for a transaction to be
-     * considered valid.
-     */
     override fun verify(tx: LedgerTransaction) {
-        val command = tx.commands.requireSingleCommand<Commands.MakePayment>()
-        requireThat {
-            // Generic constraints around the Fund transaction.
-            "No inputs should be consumed when issuing an Fund." using (tx.inputs.isEmpty())
-            "Only one output state should be created." using (tx.outputs.size == 1)
-            val out = tx.outputsOfType<FundState>().single()
-            "All of the participants must be signers." using (command.signers.containsAll(out.participants.map { it.owningKey }))
-
-            // Fund-specific constraints.
-            "The amount for dividend must be non-negative." using (out.value > 0)
-        }
+        val command = tx.commands.requireSingleCommand<DividendContract.Commands>()
+        command.value.verify(tx, command.signers)
     }
 
     interface Commands : CommandData {
         fun verify(tx: LedgerTransaction, signers: List<PublicKey>)
 
         class MakePayment : Commands {
-            companion object {
-                val CONTRACT_RULE_INPUTS = "Zero inputs should be consumed when issuing dividend."
-                val CONTRACT_RULE_OUTPUTS = "Only one output should be created when issuing dividend."
-                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when issuing dividend."
-            }
-
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                CONTRACT_RULE_INPUTS using (tx.inputs.isEmpty())
-                CONTRACT_RULE_OUTPUTS using (tx.outputs.size == 1)
+                "Zero inputs should be consumed when issuing dividend." using (tx.inputs.isEmpty())
+                "All signers must be issued dividend." using (tx.outputs.size == signers.size)
 
                 // State Rules
                 val outputState = tx.outputsOfType<FundState>().single()
-                CONTRACT_RULE_SIGNERS using (signers.containsAll(outputState.participants.map { it.owningKey }))
+                "All participants are required to sign when issuing dividend." using (signers.containsAll(outputState.participants.map { it.owningKey }))
             }
         }
     }

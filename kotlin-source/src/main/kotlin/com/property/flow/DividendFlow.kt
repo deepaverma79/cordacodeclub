@@ -3,6 +3,7 @@ package com.property.flow
 import co.paralleluniverse.fibers.Suspendable
 import com.property.contract.DividendContract
 import com.property.state.DividendState
+import com.property.state.DividendToken
 import com.property.state.FundState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
@@ -66,10 +67,13 @@ object DividendFlow {
             val txCommand = Command(DividendContract.Commands.MakePayment(), existingState.investors.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
                     .addOutputState(dividendState, DividendContract.DIVIDEND_CONTRACT_ID)
-//                    .addOutputState(DividendToken(fundManager, investor1), DividendTokenContract.ID)
-//                    .addOutputState(DividendToken(fundManager, investor2), DividendTokenContract.ID)
-//                    .addOutputState(DividendToken(fundManager, investor3), DividendTokenContract.ID)
                     .addCommand(txCommand)
+
+            val tobePaid = existingState.investors.iterator()
+            while(tobePaid.hasNext()){
+                val state = DividendToken(existingState.fundManager, tobePaid.next(), 1)
+                txBuilder.addOutputState(state, DividendContract.DIVIDEND_CONTRACT_ID)
+            }
             //TODO: Add DividendTokenContract.Commands.Issue command.
 
             // Stage 2.
@@ -101,7 +105,6 @@ object DividendFlow {
         override fun call(): SignedTransaction {
             val signTransactionFlow = object : SignTransactionFlow(otherPartyFlow) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
-
                 }
             }
             return subFlow(signTransactionFlow)

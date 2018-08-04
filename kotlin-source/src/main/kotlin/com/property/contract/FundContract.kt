@@ -40,39 +40,26 @@ open class FundContract : Contract {
         fun verify(tx: LedgerTransaction, signers: List<PublicKey>)
 
         class Issue : Commands {
-            companion object {
-                val CONTRACT_RULE_INPUTS = "Zero inputs should be consumed when issuing an Fund."
-                val CONTRACT_RULE_OUTPUTS = "Only one output state should be created."
-                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when issuing a fund."
-            }
-
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                CONTRACT_RULE_INPUTS using (tx.inputs.isEmpty())
-                CONTRACT_RULE_OUTPUTS using (tx.outputs.size == 1)
+                "Zero inputs should be consumed when issuing an Fund." using (tx.inputs.isEmpty())
+                "Only one output state should be created." using (tx.outputs.size == 1)
 
                 // State Rules
                 val outputState = tx.outputsOfType<FundState>().single()
-                CONTRACT_RULE_SIGNERS using (signers.containsAll(outputState.participants.map { it.owningKey }))
+                "All participants are required to sign when issuing a fund." using (signers.containsAll(outputState.participants.map { it.owningKey }))
 
                 // Fund-specific constraints.
                 "The Fund's value must be non-negative." using (outputState.value > 0)
                 "The Fund's value must not be greater than a 10 million." using (outputState.value < 10000000)
-
             }
         }
 
         class ChangeOwner : Commands {
-            companion object {
-                val CONTRACT_RULE_INPUTS = "At least one input should be consumed when changing ownership."
-                val CONTRACT_RULE_OUTPUTS = "At least one output should be created when changing ownership."
-                val CONTRACT_RULE_SIGNERS = "Fund manager, input owner and output owner are required to sign when changing ownership."
-            }
-
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                CONTRACT_RULE_INPUTS using (tx.inputs.isNotEmpty())
-                CONTRACT_RULE_OUTPUTS using (tx.outputs.isNotEmpty())
+                "At least one input should be consumed when changing ownership." using (tx.inputs.isNotEmpty())
+                "At least one output should be created when changing ownership." using (tx.outputs.isNotEmpty())
 
                 // State Rules
                 val input = tx.inputsOfType<FundState>().single()
@@ -83,21 +70,16 @@ open class FundContract : Contract {
                 val requiredSigners = listOf(input.fundManager, newInvestor, oldInvestor)
                 val keys = requiredSigners.map { it.owningKey }
 
-                CONTRACT_RULE_SIGNERS using signers.containsAll(keys)
+                "Fund manager, input owner and output owner are required to sign when changing ownership." using signers.containsAll(keys)
             }
         }
 
         //When a fund is cancelled the investors are then paid
         class Cancel : Commands {
-            companion object {
-                val CONTRACT_RULE_INPUTS = "Only one input should be consumed when cancelling an invoice."
-                val CONTRACT_RULE_OUTPUTS = "Zero outputs should be created when cancelling an invoice."
-            }
-
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                CONTRACT_RULE_INPUTS using (tx.inputs.size == 1)
-                CONTRACT_RULE_OUTPUTS using (tx.outputs.isEmpty())
+                "Only one input should be consumed when cancelling a fund." using (tx.inputs.size == 1)
+                "Zero outputs should be created when cancelling a fund." using (tx.outputs.isEmpty())
             }
         }
     }
