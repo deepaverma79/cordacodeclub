@@ -43,7 +43,7 @@ open class FundContract : Contract {
             companion object {
                 val CONTRACT_RULE_INPUTS = "Zero inputs should be consumed when issuing an Fund."
                 val CONTRACT_RULE_OUTPUTS = "Only one output state should be created."
-                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when issuing an invoice."
+                val CONTRACT_RULE_SIGNERS = "All participants are required to sign when issuing a fund."
             }
 
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
@@ -57,6 +57,7 @@ open class FundContract : Contract {
 
                 // Fund-specific constraints.
                 "The Fund's value must be non-negative." using (outputState.value > 0)
+                "The Fund's value must not be greater than a 10 million." using (outputState.value < 10000000)
 
             }
         }

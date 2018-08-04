@@ -5,7 +5,6 @@ import com.property.contract.PropertyContract
 import com.property.state.FundState
 import com.property.state.PropertyState
 import net.corda.core.contracts.Command
-import net.corda.core.contracts.Requirements.using
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
 import net.corda.core.identity.Party
@@ -50,10 +49,10 @@ object PropertyFlow {
             // Stage 1.
             progressTracker.currentStep = GENERATING_TRANSACTION
             // Generate an unsigned transaction.
-            val fundState = PropertyState(propertyManager, address)
-            val txCommand = Command(PropertyContract.Commands.Register(), fundState.participants.map { it.owningKey })
+            val propertyState = PropertyState(address, propertyManager)
+            val txCommand = Command(PropertyContract.Commands.Register(), propertyState.participants.map { it.owningKey })
             val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(fundState, PropertyContract.PROPERTY_CONTRACT_ID)
+                    .addOutputState(propertyState, PropertyContract.PROPERTY_CONTRACT_ID)
                     .addCommand(txCommand)
 
             // Stage 2.
@@ -85,7 +84,8 @@ object PropertyFlow {
         override fun call(): SignedTransaction {
             val signTransactionFlow = object : SignTransactionFlow(otherPartyFlow) {
                 override fun checkTransaction(stx: SignedTransaction) = requireThat {
-
+                    val output = stx.tx.outputs.single().data
+                    "This must be an PropertyState transaction." using (output is PropertyState)
                 }
             }
             return subFlow(signTransactionFlow)

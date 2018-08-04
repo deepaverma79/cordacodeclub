@@ -30,7 +30,7 @@ open class PropertyContract : Contract {
             val out = tx.outputsOfType<PropertyState>().single()
             "Property Manager must be the signer." using (command.signers.containsAll(out.participants.map { it.owningKey }))
 
-            // Fund-specific constraints.
+            // Registration-specific constraints.
             "The Property address cannot be empty." using (out.address != "" )
             "The Property must have an associated fund manager" using (out.participants.isNotEmpty())
         }

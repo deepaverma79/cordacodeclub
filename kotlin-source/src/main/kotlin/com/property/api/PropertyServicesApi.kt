@@ -25,11 +25,11 @@ val SERVICE_NAMES = listOf("Notary", "Network Map Service")
 
 // This API is accessible from /api/example. All paths specified below are relative to it.
 @Path("property")
-class FundApi(private val rpcOps: CordaRPCOps) {
+class PropertyServicesApi(private val rpcOps: CordaRPCOps) {
     private val myLegalName: CordaX500Name = rpcOps.nodeInfo().legalIdentities.first().name
 
     companion object {
-        private val logger: Logger = loggerFor<FundApi>()
+        private val logger: Logger = loggerFor<PropertyServicesApi>()
     }
 
     /**
