@@ -21,10 +21,10 @@ class DividendContractTests {
     fun `transaction must include MakePayment command`() {
         ledgerServices.ledger {
             transaction {
-                output(DIVIDEND_CONTRACT_ID, DividendState(100, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"),
-                        listOf(megaCorp.party, miniCorp.party)))
+                output(DIVIDEND_CONTRACT_ID, DividendState(100, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1458"),
+                        listOf(megaCorp.party)))
                 fails()
-                command(listOf(megaCorp.publicKey, miniCorp.publicKey), DividendContract.Commands.MakePayment())
+                command(listOf(megaCorp.publicKey), DividendContract.Commands.MakePayment())
                 verifies()
             }
         }

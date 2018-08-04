@@ -16,7 +16,7 @@ class FundContractTests {
     private val tinyCorp = TestIdentity(CordaX500Name("TinyCorp", "Tokyo", "JP"))
 
     @Test
-    fun `transaction must include Create command`() {
+    fun `transaction must include Issue command`() {
         val fundValue = 1
         ledgerServices.ledger {
             transaction {

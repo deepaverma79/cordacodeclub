@@ -1,14 +1,12 @@
 package com.property.contract
 
-import com.property.state.FundState
+import com.property.state.DividendState
 import net.corda.core.contracts.CommandData
 import net.corda.core.contracts.Contract
 import net.corda.core.contracts.Requirements.using
 import net.corda.core.contracts.requireSingleCommand
-import net.corda.core.contracts.requireThat
 import net.corda.core.transactions.LedgerTransaction
 import java.security.PublicKey
-
 
 open class DividendContract : Contract {
     companion object {
@@ -31,7 +29,7 @@ open class DividendContract : Contract {
                 "All signers must be issued dividend." using (tx.outputs.size == signers.size)
 
                 // State Rules
-                val outputState = tx.outputsOfType<FundState>().single()
+                val outputState = tx.outputsOfType<DividendState>().single()
                 "All participants are required to sign when issuing dividend." using (signers.containsAll(outputState.participants.map { it.owningKey }))
             }
         }
