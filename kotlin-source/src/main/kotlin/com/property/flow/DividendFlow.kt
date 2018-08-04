@@ -2,6 +2,7 @@ package com.property.flow
 
 import co.paralleluniverse.fibers.Suspendable
 import com.property.contract.DividendContract
+import com.property.contract.DividendTokenContract
 import com.property.state.DividendState
 import com.property.state.DividendToken
 import com.property.state.FundState
@@ -9,6 +10,7 @@ import net.corda.core.contracts.Command
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.contracts.requireThat
 import net.corda.core.flows.*
+import net.corda.core.identity.Party
 import net.corda.core.node.services.queryBy
 import net.corda.core.node.services.vault.QueryCriteria
 import net.corda.core.transactions.SignedTransaction
@@ -65,15 +67,15 @@ object DividendFlow {
             // Generate an unsigned transaction.
             val dividendState = DividendState(amount, fundId, existingState.investors)
             val txCommand = Command(DividendContract.Commands.MakePayment(), existingState.investors.map { it.owningKey })
+
             val txBuilder = TransactionBuilder(notary)
                     .addOutputState(dividendState, DividendContract.DIVIDEND_CONTRACT_ID)
+//                  .addOutputState(DividendToken(fundManager, investor1), DividendTokenContract.ID)
+//                  .addOutputState(DividendToken(fundManager, investor2), DividendTokenContract.ID)
+//                  .addOutputState(DividendToken(fundManager, investor3), DividendTokenContract.ID)
                     .addCommand(txCommand)
+            //TODO: Add DividendTokenContract.Commands.Issue command.
 
-            val tobePaid = existingState.investors.iterator()
-            while(tobePaid.hasNext()){
-                val state = DividendToken(existingState.fundManager, tobePaid.next(), 1)
-                txBuilder.addOutputState(state, DividendContract.DIVIDEND_CONTRACT_ID)
-            }
             // Stage 2.
             progressTracker.currentStep = DividendFlow.Initiator.Companion.VERIFYING_TRANSACTION
             // Verify that the transaction is valid.
@@ -96,6 +98,7 @@ object DividendFlow {
             return subFlow(FinalityFlow(fullySignedTx, DividendFlow.Initiator.Companion.FINALISING_TRANSACTION.childProgressTracker()))
         }
     }
+
 
     @InitiatedBy(Initiator::class)
     class Acceptor(val otherPartyFlow: FlowSession) : FlowLogic<SignedTransaction>() {

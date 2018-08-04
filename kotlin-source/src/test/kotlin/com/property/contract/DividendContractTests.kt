@@ -61,13 +61,15 @@ class DividendContractTests {
     }
 
     @Test
-    fun `All participants are required to sign when issuing dividend`() {
+    fun `Dividend payable must be non-negative`() {
         ledgerServices.ledger {
             transaction {
-                output(DIVIDEND_CONTRACT_ID, DividendState(100, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"),
+                output(DIVIDEND_CONTRACT_ID, DividendState(-1, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"),
                         listOf(megaCorp.party, miniCorp.party)))
-                command(listOf(megaCorp.publicKey), DividendContract.Commands.MakePayment())
-                `fails with`("All participants are required to sign when issuing dividend.")
+                output(DIVIDEND_CONTRACT_ID, DividendState(-1, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"),
+                        listOf(megaCorp.party, miniCorp.party)))
+                command(listOf(megaCorp.publicKey, megaCorp.publicKey), DividendContract.Commands.MakePayment())
+                `fails with`("Dividend payable value must be non-negative.")
             }
         }
     }

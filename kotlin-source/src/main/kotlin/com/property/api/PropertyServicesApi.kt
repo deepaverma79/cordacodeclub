@@ -143,7 +143,7 @@ class PropertyServicesApi(private val rpcOps: CordaRPCOps) {
         val fundId = UniqueIdentifier.fromString(fundIdString)
         return try {
             val signedTx = rpcOps.startTrackedFlow(DividendFlow::Initiator, amount, fundId).returnValue.getOrThrow()
-            Response.status(CREATED).entity("Property id ${signedTx.id} committed to ledger.\n").build()
+            Response.status(CREATED).entity("Amount ${amount} to be paid as for ${fundId} committed to ledger with id:  ${signedTx.id}.\n").build()
 
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
