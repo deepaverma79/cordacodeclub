@@ -74,8 +74,6 @@ object DividendFlow {
                 val state = DividendToken(existingState.fundManager, tobePaid.next(), 1)
                 txBuilder.addOutputState(state, DividendContract.DIVIDEND_CONTRACT_ID)
             }
-            //TODO: Add DividendTokenContract.Commands.Issue command.
-
             // Stage 2.
             progressTracker.currentStep = DividendFlow.Initiator.Companion.VERIFYING_TRANSACTION
             // Verify that the transaction is valid.

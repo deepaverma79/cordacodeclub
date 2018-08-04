@@ -27,7 +27,7 @@ open class DividendContract : Contract {
         class MakePayment : Commands {
             override fun verify(tx: LedgerTransaction, signers: List<PublicKey>) {
                 // Transaction Rules
-                "Zero inputs should be consumed when issuing dividend." using (tx.inputs.isEmpty())
+                "No inputs should be consumed when issuing dividend." using (tx.inputs.isEmpty())
                 "All signers must be issued dividend." using (tx.outputs.size == signers.size)
 
                 // State Rules
