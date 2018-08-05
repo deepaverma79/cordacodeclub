@@ -1,3 +1,4 @@
+///*
 //package com.property.flow
 //
 //import com.property.state.DividendState
@@ -38,6 +39,10 @@
 //
 //    @Test
 //    fun `flow rejects invalid DividendStates`() {
+//        val fundflow = FundFlow.Initiator(1, listOf(b.info.singleIdentity(), c.info.singleIdentity()))
+//        val fundfuture = a.startFlow(fundflow)
+//        network.runNetwork()
+//
 //        val flow = DividendFlow.Initiator(-1, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"))
 //        val future = a.startFlow(flow)
 //        network.runNetwork()
@@ -48,7 +53,7 @@
 //
 //    @Test
 //    fun `SignedTransaction returned by the flow is signed by the initiator`() {
-//        val flow = DividendFlow.Initiator(1, listOf(b.info.singleIdentity(), c.info.singleIdentity()))
+//        val flow = DividendFlow.Initiator(1, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"))
 //        val future = a.startFlow(flow)
 //        network.runNetwork()
 //
@@ -58,7 +63,7 @@
 //
 //    @Test
 //    fun `SignedTransaction returned by the flow is signed by the acceptor`() {
-//        val flow = DividendFlow.Initiator(1, listOf(b.info.singleIdentity(), c.info.singleIdentity()))
+//        val flow = DividendFlow.Initiator(1, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"))
 //        val future = a.startFlow(flow)
 //        network.runNetwork()
 //
@@ -67,8 +72,8 @@
 //    }
 //
 //    @Test
-//    fun `flow records a transaction in both parties' transaction storages`() {
-//        val flow = DividendFlow.Initiator(1,listOf(b.info.singleIdentity(), c.info.singleIdentity()))
+//    fun `flow records a transaction in all investors' transaction storages`() {
+//        val flow = DividendFlow.Initiator(1,UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"))
 //        val future = a.startFlow(flow)
 //        network.runNetwork()
 //        val signedTx = future.getOrThrow()
@@ -82,7 +87,7 @@
 //    @Test
 //    fun `recorded transaction has no inputs and a single output, the input DividendState`() {
 //        val DividendValue = 1
-//        val flow = DividendFlow.Initiator(DividendValue,listOf(b.info.singleIdentity(), c.info.singleIdentity()))
+//        val flow = DividendFlow.Initiator(DividendValue,UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"))
 //        val future = a.startFlow(flow)
 //        network.runNetwork()
 //        val signedTx = future.getOrThrow()
@@ -94,30 +99,7 @@
 //            assert(txOutputs.size == 1)
 //
 //            val recordedState = txOutputs[0].data as DividendState
-//            assertEquals(recordedState.value, DividendValue)
-//            assertEquals(recordedState.DividendManager, a.info.singleIdentity())
-//            assertEquals(recordedState.investors,listOf(b.info.singleIdentity(), c.info.singleIdentity()))
+//            assertEquals(recordedState.amount, DividendValue)
 //        }
 //    }
-//
-//    @Test
-//    fun `flow records the correct DividendState in both parties' vaults`() {
-//        val DividendValue = 1
-//        val flow = DividendFlow.Initiator(1, listOf(b.info.singleIdentity(), c.info.singleIdentity()))
-//        val future = a.startFlow(flow)
-//        network.runNetwork()
-//        future.getOrThrow()
-//
-//        // We check the recorded DividendState in both vaults.
-//        for (node in listOf(a, b)) {
-//            node.transaction {
-//                val DividendStates = node.services.vaultService.queryBy<DividendState>().states
-//                assertEquals(1, DividendStates.size)
-//                val recordedState = DividendStates.single().state.data
-//                assertEquals(recordedState.value, DividendValue)
-//                assertEquals(recordedState.DividendManager, a.info.singleIdentity())
-//                assertEquals(recordedState.investors, listOf(b.info.singleIdentity(), c.info.singleIdentity()))
-//            }
-//        }
-//    }
-//}
+//}*/

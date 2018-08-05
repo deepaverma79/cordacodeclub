@@ -65,17 +65,12 @@ object DividendFlow {
             // Stage 1.
             progressTracker.currentStep = DividendFlow.Initiator.Companion.GENERATING_TRANSACTION
             // Generate an unsigned transaction.
-            val dividendState = DividendState(amount, fundId, existingState.investors)
             val txCommand = Command(DividendContract.Commands.MakePayment(), existingState.investors.map { it.owningKey })
-
-            val txBuilder = TransactionBuilder(notary)
-                    .addOutputState(dividendState, DividendContract.DIVIDEND_CONTRACT_ID)
-//                  .addOutputState(DividendToken(fundManager, investor1), DividendTokenContract.ID)
-//                  .addOutputState(DividendToken(fundManager, investor2), DividendTokenContract.ID)
-//                  .addOutputState(DividendToken(fundManager, investor3), DividendTokenContract.ID)
-                    .addCommand(txCommand)
-            //TODO: Add DividendTokenContract.Commands.Issue command.
-
+            val txBuilder = TransactionBuilder(notary).addCommand(txCommand)
+            val investors = existingState.investors.iterator()
+            while (investors.hasNext()) {
+                txBuilder.addOutputState(DividendState(amount, fundId, listOf(investors.next())), DividendContract.DIVIDEND_CONTRACT_ID)
+            }
             // Stage 2.
             progressTracker.currentStep = DividendFlow.Initiator.Companion.VERIFYING_TRANSACTION
             // Verify that the transaction is valid.

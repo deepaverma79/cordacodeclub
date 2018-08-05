@@ -5,7 +5,9 @@ import com.property.flow.ChangeOwnerFlow
 import com.property.flow.DividendFlow
 import com.property.flow.FundFlow
 import com.property.flow.PropertyFlow
+import com.property.state.DividendState
 import com.property.state.FundState
+import com.property.state.PropertyState
 import net.corda.core.contracts.UniqueIdentifier
 import net.corda.core.identity.CordaX500Name
 import net.corda.core.messaging.CordaRPCOps
@@ -55,13 +57,10 @@ class PropertyServicesApi(private val rpcOps: CordaRPCOps) {
                 .filter { it.organisation !in (SERVICE_NAMES + myLegalName.organisation) })
     }
 
-    /**
-     * Displays all FundState states that exist in the node's vault.
-     */
     @GET
-    @Path("funds")
+    @Path("my-properties")
     @Produces(MediaType.APPLICATION_JSON)
-    fun getFunds() = rpcOps.vaultQueryBy<FundState>().states
+    fun getMyProperties() = rpcOps.vaultQueryBy<PropertyState>().states
 
     /**
      * Initiates a flow to agree an FundState between two parties.
@@ -97,7 +96,6 @@ class PropertyServicesApi(private val rpcOps: CordaRPCOps) {
         }
     }
 
-    // TODO : Unique Identifier doesnt work with the REST URL
     @PUT
     @Path("sell-fund-share")
     fun changeFundInvestors(
@@ -120,7 +118,7 @@ class PropertyServicesApi(private val rpcOps: CordaRPCOps) {
 
         return try {
             val signedTx = rpcOps.startTrackedFlow(ChangeOwnerFlow::Initiator, currentInvestor, newInvestor, fundId).returnValue.getOrThrow()
-            Response.status(CREATED).entity("Property id ${signedTx.id} committed to ledger.\n").build()
+            Response.status(CREATED).entity("Transaction ${signedTx.id} to sell shares from ${currentInvestorString} to ${newInvestorString} committed to ledger.\n").build()
 
         } catch (ex: Throwable) {
             logger.error(ex.message, ex)
@@ -183,5 +181,13 @@ class PropertyServicesApi(private val rpcOps: CordaRPCOps) {
     fun myfunds(): Response {
         val funds = rpcOps.vaultQueryBy<FundState>().states
         return Response.ok(funds).build()
+    }
+
+    @GET
+    @Path("my-dividend")
+    @Produces(MediaType.APPLICATION_JSON)
+    fun issuedDividends(): Response {
+        val dividends = rpcOps.vaultQueryBy<DividendState>().states
+        return Response.ok(dividends).build()
     }
 }

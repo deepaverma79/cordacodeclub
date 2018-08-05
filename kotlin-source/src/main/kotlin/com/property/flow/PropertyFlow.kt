@@ -2,7 +2,6 @@ package com.property.flow
 
 import co.paralleluniverse.fibers.Suspendable
 import com.property.contract.PropertyContract
-import com.property.state.FundState
 import com.property.state.PropertyState
 import net.corda.core.contracts.Command
 import net.corda.core.contracts.requireThat

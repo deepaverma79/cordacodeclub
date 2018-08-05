@@ -15,7 +15,6 @@ class DividendContractTests {
     private val ledgerServices = MockServices()
     private val megaCorp = TestIdentity(CordaX500Name("MegaCorp", "London", "GB"))
     private val miniCorp = TestIdentity(CordaX500Name("MiniCorp", "New York", "US"))
-    private val tinyCorp = TestIdentity(CordaX500Name("TinyCorp", "Tokyo", "JP"))
 
     @Test
     fun `transaction must include MakePayment command`() {
@@ -65,23 +64,11 @@ class DividendContractTests {
         ledgerServices.ledger {
             transaction {
                 output(DIVIDEND_CONTRACT_ID, DividendState(-1, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"),
-                        listOf(megaCorp.party, miniCorp.party)))
-                output(DIVIDEND_CONTRACT_ID, DividendState(-1, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"),
-                        listOf(megaCorp.party, miniCorp.party)))
-                command(listOf(megaCorp.publicKey, megaCorp.publicKey), DividendContract.Commands.MakePayment())
+                        listOf(megaCorp.party)))
+                command(listOf(megaCorp.publicKey), DividendContract.Commands.MakePayment())
                 `fails with`("Dividend payable value must be non-negative.")
             }
         }
     }
 
-    @Test
-    fun `All investors must be the signer`() {
-        ledgerServices.ledger {
-            transaction {
-                output(DIVIDEND_CONTRACT_ID, DividendState(100, UniqueIdentifier.fromString("42fc9002-97f2-11e8-9eb6-529269fb1459"),  listOf(miniCorp.party)))
-                command(listOf(megaCorp.publicKey, tinyCorp.publicKey), DividendContract.Commands.MakePayment())
-                `fails with`("All signers must be issued dividend.")
-            }
-        }
-    }
 }
